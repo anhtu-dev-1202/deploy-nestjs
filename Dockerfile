@@ -8,7 +8,7 @@ COPY package*.json ./
 
 RUN yarn install
 
-COPY ..
+COPY . .
 
 RUN yarn build
 
@@ -32,4 +32,4 @@ RUN rm package*.json
 
 EXPOSE 3000
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "node", "dist/main.js" ]
