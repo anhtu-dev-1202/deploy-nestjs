@@ -8,8 +8,8 @@ on:
 env:
   AWS_REGION: ap-southeast-1                            # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: nesjt-deploy                          # set this to your Amazon ECR repository name
-  ECS_SERVICE: nestjs-deploy-service                    # set this to your Amazon ECS service name
-  ECS_CLUSTER: tu-cluster                               # set this to your Amazon ECS cluster name
+  ECS_SERVICE: nestjs-service                    # set this to your Amazon ECS service name
+  ECS_CLUSTER: TuCluster                               # set this to your Amazon ECS cluster name
                                                         # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: nestjs-deploy                         # set this to the name of the container in the
                                                         # containerDefinitions section of your task definition
@@ -50,7 +50,7 @@ jobs:
 
       - name: Download task definition
         env:
-          TASK_DEFINITION: teramusubi-staging-task-definition
+          TASK_DEFINITION: tu-tdc
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION \
           --query taskDefinition > task-definition.json
