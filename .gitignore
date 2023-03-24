@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/mongodb-backup
 
 # Logs
 logs
@@ -37,3 +38,4 @@ lerna-debug.log*
 # Docker
 
 docker-compose.yaml
+
