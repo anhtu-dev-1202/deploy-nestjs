@@ -11,7 +11,7 @@ hooks:
     - location: scripts/after_install.sh
       runas: ubuntu
       timeout: 3600
-  ApplicationStart:
-    - location: scripts/application_start.sh
-      runas: ubuntu
+  ApplicationStop:
+    - location: scripts/stop_server.sh
       timeout: 3600
+      runas: ubuntu
