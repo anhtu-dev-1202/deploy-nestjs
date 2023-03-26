@@ -3,7 +3,7 @@
 # pm2 stop deploy-nestjs
 
 # Move to the deployment directory
-# cd /var/www/deploy-nestjs
+# cd /var/www/html/deploy-nestjs
 
 # Install dependencies
 # npm install
