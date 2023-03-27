@@ -10,3 +10,5 @@
 
 # Restart the Node.js app
 # pm2 start deploy-nestjs
+
+docker build -t nesjt-deploy .
