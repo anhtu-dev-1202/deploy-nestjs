@@ -1,14 +1,12 @@
-#!/bin/bash
-# Stop the Node.js app
-# pm2 stop deploy-nestjs
-
-# Move to the deployment directory
+#Run with docker
 cd /var/www/html/deploy-nestjs
 
-# Install dependencies
-# npm install
-
-# Restart the Node.js app
-# pm2 start deploy-nestjs
-
 docker build -t nesjt-deploy .
+
+if docker ps -a | grep -q tera; then
+    docker container stop tera
+    docker container rm tera
+fi
+
+docker run -d --name tera -p 3000:3000 nesjt-deploy
+docker image prune -f
