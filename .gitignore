@@ -23,6 +23,7 @@ lerna-debug.log*
 /.idea
 .project
 .history
+.env
 .classpath
 .c9/
 *.launch
