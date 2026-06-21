@@ -40,3 +40,5 @@ lerna-debug.log*
 
 docker-compose.yaml
 
+# .gitignore
+.env*

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:15-alpine # Sử dụng bản alpine để dung lượng nhẹ và ổn định
+    container_name: nestjs_postgres_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: e-com
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Giữ lại dữ liệu không bị mất khi tắt container
+    networks:
+      - nestjs_network
+
+volumes:
+  postgres_data: # Khai báo volume lưu trữ dữ liệu bền vững
+
+networks:
+  nestjs_network: # Khai báo network chung (nếu sau này bạn muốn chạy NestJS bằng Docker)
+    driver: bridge

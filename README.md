@@ -1,73 +1,477 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Architecture Guide
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project follows:
 
-## Description
+* **Domain-Driven Design (DDD)**
+* **Clean Architecture**
+* **Modular Monolith (Microservice-ready)**
+* **NestJS**
+* **TypeORM**
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Core principles:
 
-## Installation
+* Business rules belong to Domain.
+* Use cases orchestrate workflows.
+* Infrastructure implements contracts.
+* Modules communicate through events.
+* Dependencies point inward.
 
-```bash
-$ yarn install
+---
+
+# Module Structure
+
+```text
+modules/
+├── order/
+├── inventory/
+├── product/
+├── customer/
+└── shared/
 ```
 
-## Running the app
+Each module is a bounded context and owns its own domain.
 
-```bash
-# development
-$ yarn run start
+---
 
-# watch mode
-$ yarn run start:dev
+# Module Layout
 
-# production mode
-$ yarn run start:prod
+Example: Inventory
+
+```text
+inventory/
+│
+├── domain/
+│   ├── entities/
+│   │     inventory.entity.ts
+│   │
+│   ├── repositories/
+│   │     inventory.repository.ts
+│   │
+│   ├── services/
+│   │     stock-allocation.service.ts
+│   │
+│   ├── events/
+│   │     stock-reserved.event.ts
+│   │
+│   └── value-objects/
+│
+├── application/
+│   ├── commands/
+│   │
+│   ├── queries/
+│   │
+│   ├── use-cases/
+│   │     reserve-stock.usecase.ts
+│   │     release-stock.usecase.ts
+│   │     check-availability.usecase.ts
+│   │
+│   ├── listeners/
+│   │     order-created.listener.ts
+│   │
+│   └── inventory.facade.ts
+│
+├── infrastructure/
+│   ├── orm/
+│   │     inventory.orm.entity.ts
+│   │
+│   ├── persistence/
+│   │     inventory.repository.impl.ts
+│   │
+│   └── mappers/
+│
+├── presentation/
+│   ├── controllers/
+│   ├── dto/
+│   └── responses/
+│
+├── providers/
+│     inventory.providers.ts
+│
+└── inventory.module.ts
 ```
 
-## Test
+---
 
-```bash
-# unit tests
-$ yarn run test
+# Layers
 
-# e2e tests
-$ yarn run test:e2e
+## Domain Layer
 
-# test coverage
-$ yarn run test:cov
+Contains:
+
+* Entities
+* Value Objects
+* Domain Services
+* Repository Interfaces
+* Domain Events
+
+Domain must not depend on:
+
+* NestJS
+* TypeORM
+* Redis
+* Kafka
+* HTTP
+
+Example:
+
+```ts
+inventory.reserve(quantity);
+inventory.release(quantity);
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Application Layer
 
-## Stay in touch
+Responsible for orchestration.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Contains:
 
-## License
+* Use Cases
+* Event Listeners
+* Facades
+* Command Handlers
+* Query Handlers
 
-Nest is [MIT licensed](LICENSE).
+Example:
+
+```ts
+ReserveStockUseCase
+CreateOrderUseCase
+CancelOrderUseCase
+```
+
+Responsibilities:
+
+* Load entities
+* Invoke domain logic
+* Save aggregates
+* Publish events
+
+---
+
+## Infrastructure Layer
+
+Contains implementation details.
+
+Examples:
+
+* TypeORM repositories
+* Redis
+* Kafka
+* EventBus
+* External APIs
+
+Example:
+
+```ts
+InventoryRepositoryImpl
+OrderRepositoryImpl
+```
+
+Infrastructure implements interfaces defined by Domain.
+
+---
+
+## Presentation Layer
+
+Responsible for:
+
+* Controllers
+* DTO validation
+* Request/Response mapping
+
+Example:
+
+```ts
+POST /orders
+GET /inventory
+```
+
+Presentation must not contain business logic.
+
+---
+
+# Entity Responsibilities
+
+Entities protect business invariants.
+
+Example:
+
+```ts
+inventory.reserve(quantity);
+```
+
+Business rule:
+
+```ts
+if (available < quantity)
+    throw new NotEnoughStockException();
+```
+
+Entities own state transitions.
+
+---
+
+# Domain Services
+
+Domain services contain business rules that do not belong to a single entity.
+
+Example:
+
+```ts
+StockAllocationService
+PricingService
+ShippingFeeCalculator
+```
+
+Example:
+
+```ts
+allocator.allocate(
+    inventories,
+    requiredQuantity,
+);
+```
+
+---
+
+# Use Cases
+
+Use cases coordinate workflows.
+
+Example:
+
+```ts
+ReserveStockUseCase
+ReleaseStockUseCase
+CreateOrderUseCase
+```
+
+Responsibilities:
+
+1. Load aggregates
+2. Invoke domain logic
+3. Persist changes
+4. Emit domain events
+
+---
+
+# Events
+
+Modules communicate through events.
+
+Example:
+
+```text
+Order
+  ↓
+order.created
+  ↓
+Inventory
+  ↓
+reserve stock
+```
+
+Example:
+
+```ts
+@OnEvent('order.created')
+handle(event) {
+    return reserveStockUseCase.execute(event);
+}
+```
+
+Listeners should contain no business logic.
+
+---
+
+# Providers
+
+Avoid huge modules.
+
+Create provider groups.
+
+Example:
+
+```ts
+export const InventoryUseCases = [
+    ReserveStockUseCase,
+    ReleaseStockUseCase,
+];
+
+export const InventoryListeners = [
+    OrderCreatedListener,
+];
+
+export const InventoryRepositories = [
+    {
+        provide: INVENTORY_REPOSITORY,
+        useClass: InventoryRepositoryImpl,
+    },
+];
+```
+
+Module:
+
+```ts
+providers: [
+    InventoryFacade,
+    ...InventoryUseCases,
+    ...InventoryListeners,
+    ...InventoryRepositories,
+];
+```
+
+---
+
+# Validation
+
+## DTO Validation
+
+Presentation layer only.
+
+Examples:
+
+* required fields
+* string
+* UUID
+* quantity > 0
+
+Example:
+
+```ts
+@Min(1)
+quantity: number;
+```
+
+---
+
+## Domain Validation
+
+Business rules.
+
+Examples:
+
+* insufficient stock
+* minimum order amount
+* credit limit exceeded
+* customer blacklisted
+
+Example:
+
+```ts
+inventory.reserve(quantity);
+```
+
+---
+
+# Communication
+
+Preferred:
+
+```text
+Controller
+    ↓
+Facade
+    ↓
+Use Case
+    ↓
+Domain
+    ↓
+Repository
+```
+
+Cross-module:
+
+```text
+Order
+    ↓
+Domain Event
+    ↓
+Inventory Listener
+    ↓
+ReserveStockUseCase
+```
+
+Never:
+
+```text
+OrderService
+    ↓
+InventoryService
+```
+
+---
+
+# Shared Module
+
+```text
+shared/
+│
+├── domain/
+├── exceptions/
+├── infrastructure/
+├── utils/
+└── constants/
+```
+
+Contains:
+
+* BaseEntity
+* AggregateRoot
+* DomainEvent
+* EventBus abstraction
+* Logger
+* Exceptions
+
+---
+
+# Dependency Rule
+
+Allowed:
+
+```text
+Presentation
+    ↓
+Application
+    ↓
+Domain
+```
+
+Infrastructure implements Domain contracts.
+
+Forbidden:
+
+```text
+Domain
+    ↓
+Infrastructure
+```
+
+```text
+Domain
+    ↓
+NestJS
+```
+
+```text
+Domain
+    ↓
+Database
+```
+
+---
+
+# Architectural Principles
+
+* Rich Domain Model
+* Thin Controllers
+* Thin Listeners
+* Use Cases orchestrate workflows
+* Domain owns business rules
+* Infrastructure contains implementation details
+* Event-driven module communication
+* Microservice-ready boundaries
