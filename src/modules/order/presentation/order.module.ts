@@ -6,10 +6,15 @@ import { OrderRepositoryImpl } from '../infrastructure/persistence/order.reposit
 import { OrderFacade } from '../application/order.facade';
 import { orderUseCases } from '../application/order.use-cases';
 import { SharedModule } from 'shared/shared.module';
-import { ORDER_REPOSITORY } from 'shared/constants/repositories-impl.contants';
+import { ORDER_REPOSITORY } from 'shared/constants/repositories-impl.constants';
+import { EventBusModule } from 'infrastructure/event-bus/event-bus.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderOrmEntity]), SharedModule],
+  imports: [
+    TypeOrmModule.forFeature([OrderOrmEntity]),
+    SharedModule,
+    EventBusModule,
+  ],
   controllers: [OrderController],
   providers: [
     OrderFacade,

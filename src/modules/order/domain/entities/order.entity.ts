@@ -1,9 +1,9 @@
-import { OrderItem } from "./order-item.entity";
-import { OrderStatus } from "../value-objects/order-status.vo";
-import { Money } from "../value-objects/money.vo";
-import { Email } from "modules/customer/domain/value-objects/email.vo";
-import { AggregateRoot } from "shared/domain/aggregate-root";
-import { Guard } from "shared/utils/guard";
+import { OrderItem } from './order-item.entity';
+import { OrderStatus } from '../value-objects/order-status.vo';
+import { Money } from '../value-objects/money.vo';
+import { Email } from 'modules/customer/domain/value-objects/email.vo';
+import { AggregateRoot } from 'shared/domain/aggregate-root';
+import { Guard } from 'shared/utils/guard';
 
 export class Order extends AggregateRoot {
   constructor(
@@ -14,10 +14,10 @@ export class Order extends AggregateRoot {
     public status: OrderStatus,
     public items: OrderItem[],
   ) {
-      super(id, new Date(), new Date());
+    super(id, new Date(), new Date());
 
-      Guard.againstNullOrUndefined(customerId, 'CustomerId is required');
-      Guard.againstNullOrUndefined(id, 'Order id required');
+    Guard.againstNullOrUndefined(customerId, 'CustomerId is required');
+    Guard.againstNullOrUndefined(id, 'Order id required');
   }
 
   static create(input: Order) {

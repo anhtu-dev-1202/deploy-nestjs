@@ -5,14 +5,9 @@ import { DomainEvent } from 'shared/domain/domain-event';
 
 @Injectable()
 export class EventBusService implements EventBus {
-  constructor(
-    private readonly eventEmitter: EventEmitter2,
-  ) {}
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  async publish(event: DomainEvent): Promise<void> {
-    await this.eventEmitter.emitAsync(
-      event.name,
-      event,
-    );
+  async publish(event: DomainEvent<any>): Promise<void> {
+    await this.eventEmitter.emitAsync(event.name, event);
   }
 }

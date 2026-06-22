@@ -16,9 +16,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async save(order: Order): Promise<void> {
     const entity = OrderMapper.toOrm(order);
 
-    await this.repo.save(
-      this.repo.create(entity),
-    );
+    await this.repo.save(this.repo.create(entity));
   }
 
   async findById(id: string): Promise<Order | null> {

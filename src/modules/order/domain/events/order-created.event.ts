@@ -1,7 +1,6 @@
-import { DomainEvent } from "shared/domain/domain-event";
+import { DomainEvent } from 'shared/domain/domain-event';
 
-
-interface OrderCreatedPayload {
+export interface OrderCreatedPayload {
   orderId: string;
   items: {
     productId: string;
@@ -10,5 +9,5 @@ interface OrderCreatedPayload {
 }
 
 export class OrderCreatedEvent extends DomainEvent<OrderCreatedPayload> {
-  readonly eventName = 'order.created';
+  readonly name = 'order.created';
 }

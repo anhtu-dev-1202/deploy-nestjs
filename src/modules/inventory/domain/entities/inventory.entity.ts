@@ -1,4 +1,4 @@
-import { Quantity } from "../value-objects/quantity.vo";
+import { Quantity } from '../value-objects/quantity.vo';
 
 export class Inventory {
   constructor(

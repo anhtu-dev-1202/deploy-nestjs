@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OrderRepository } from '../../domain/repositories/order.repository';
-import { ORDER_REPOSITORY } from 'modules/shared/common/token';
 import { OrderStatus } from 'modules/order/domain/value-objects/order-status.vo';
+import { ORDER_REPOSITORY } from 'shared/constants/repositories-impl.constants';
 
 @Injectable()
 export class CancelOrderUseCase {

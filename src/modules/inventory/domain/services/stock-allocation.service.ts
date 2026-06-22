@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { Inventory } from "../entities/inventory.entity";
-import { Quantity } from "../value-objects/quantity.vo";
+import { Injectable } from '@nestjs/common';
+import { Inventory } from '../entities/inventory.entity';
+import { Quantity } from '../value-objects/quantity.vo';
 
 export interface AllocationResult {
   warehouseId: string;
@@ -10,10 +10,7 @@ export interface AllocationResult {
 
 @Injectable()
 export class StockAllocationService {
-  allocate(
-    inventories: Inventory[],
-    requiredQty: number,
-  ): AllocationResult[] {
+  allocate(inventories: Inventory[], requiredQty: number): AllocationResult[] {
     let remaining = requiredQty;
     const result: AllocationResult[] = [];
 

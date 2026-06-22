@@ -1,4 +1,4 @@
-import { ValueObject } from "modules/shared/domain/value-object";
+import { ValueObject } from 'shared/domain/value-object';
 
 export enum ORDER_STATUS {
   DRAFT = 'DRAFT',

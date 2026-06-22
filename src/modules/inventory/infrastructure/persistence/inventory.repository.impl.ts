@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { InventoryOrmEntity } from '../orm/inventory.orm';
 import { Inventory } from 'modules/inventory/domain/entities/inventory.entity';
 import { InventoryRepository } from 'modules/inventory/domain/repositories/inventory.repository';
-import { Quantity } from 'modules/inventory/domain/value-objects/quantity.vo';
+import { InventoryMapper } from '../mapper/inventory.mapper';
 
 @Injectable()
 export class InventoryRepositoryImpl implements InventoryRepository {
@@ -17,24 +17,45 @@ export class InventoryRepositoryImpl implements InventoryRepository {
     const data = await this.repo.findOneBy({ productId });
     if (!data) return null;
 
-    return new Inventory(data.warehouseId, data.productId, new Quantity(data.available), new Quantity(data.reserved));
+    return InventoryMapper.toDomain(data);
   }
 
   async save(inv: Inventory): Promise<void> {
-    const newInv = new InventoryOrmEntity();
-    newInv.warehouseId = inv.warehouseId;
-    newInv.productId = inv.productId;
-    newInv.available = inv.available.value;
-    newInv.reserved = inv.reserved.value;
+    const newInv = InventoryMapper.toOrm(inv);
 
     await this.repo.save(newInv);
   }
 
-  async findByProductIdAcrossWarehouses(productId: string): Promise<Inventory[]> {
+  async findByProductIdAcrossWarehouses(
+    productId: string,
+  ): Promise<Inventory[]> {
     const data = await this.repo.findBy({ productId });
-    
-    return data.map(
-      (d) => new Inventory(d.warehouseId, d.productId, new Quantity(d.available), new Quantity(d.reserved)),
-    );
+
+    return data.map(InventoryMapper.toDomain);
+  }
+
+  async findByProductIdsForUpdate(
+    manager: EntityManager,
+    productIds: string[],
+  ): Promise<Inventory[]> {
+    const entities = await manager.find(InventoryOrmEntity, {
+      where: {
+        productId: In(productIds),
+      },
+      lock: {
+        mode: 'pessimistic_write',
+      },
+    });
+
+    return entities.map(InventoryMapper.toDomain);
+  }
+
+  async saveMany(
+    manager: EntityManager,
+    inventories: Inventory[],
+  ): Promise<void> {
+    const entities = inventories.map(InventoryMapper.toOrm);
+
+    await manager.save(InventoryOrmEntity, entities);
   }
 }

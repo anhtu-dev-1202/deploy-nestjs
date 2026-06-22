@@ -5,9 +5,9 @@ import { OrderRepository } from '../../domain/repositories/order.repository';
 import { OrderStatus } from 'modules/order/domain/value-objects/order-status.vo';
 import { Email } from 'modules/customer/domain/value-objects/email.vo';
 import { Money } from 'modules/order/domain/value-objects/money.vo';
-import { ORDER_REPOSITORY } from 'shared/constants/repositories-impl.contants';
+import { ORDER_REPOSITORY } from 'shared/constants/repositories-impl.constants';
 import { EventBusService } from 'infrastructure/event-bus/event-bus.service';
-import { EVENT_BUS } from 'shared/constants/events.contants';
+import { EVENT_BUS } from 'shared/constants/events.constants';
 import { OrderCreatedEvent } from 'modules/order/domain/events/order-created.event';
 
 @Injectable()
@@ -44,15 +44,13 @@ export class CreateOrderUseCase {
     await this.repo.save(order);
 
     await this.eventBus.publish(
-      new OrderCreatedEvent(
-        {
-          orderId: order.id,
-          items: order.items.map(i => ({
-            productId: i.productId,
-            quantity: i.quantity,
-          }))
-        }
-      ),
+      new OrderCreatedEvent({
+        orderId: order.id,
+        items: order.items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      }),
     );
 
     return order;

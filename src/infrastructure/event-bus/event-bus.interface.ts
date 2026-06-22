@@ -1,5 +1,5 @@
-import { DomainEvent } from "shared/domain/domain-event";
+import { DomainEvent } from 'shared/domain/domain-event';
 
 export interface EventBus {
-  publish(event: DomainEvent): Promise<void>;
+  publish(event: DomainEvent<any>): Promise<void>;
 }
